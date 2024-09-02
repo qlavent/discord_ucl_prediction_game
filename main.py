@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 from data_fetch import fetch_prem_today
 from keep_alive import keep_alive
 
+keep_alive()
+
 # Load environment variables from the .env file
 load_dotenv()
 
