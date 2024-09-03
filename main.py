@@ -1,42 +1,36 @@
 import discord
+from discord.ext import commands, tasks
 import os
+from commands import register_commands
+from game_updates import check_game_updates
+from firestore_db import init_firestore
 from dotenv import load_dotenv
-import requests
-import json
-from datetime import datetime, timedelta
-from data_fetch import fetch_prem_today
-from keep_alive import keep_alive
-import firestore_interaction
 
-# Load environment variables from the .env file
+# Load environment variables
 load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
 
+# Initialize Firestore
+init_firestore()
 
-class MyClient(discord.Client):
-
-  async def on_ready(self):
-    print('Logged on as', self.user)
-
-  async def on_message(self, message):
-    # don't respond to ourselves
-    if message.author == self.user:
-      return
-    
-    msg = message.content.lower()
-    if msg == 'ping':
-      await message.channel.send('pong')
-
-    if msg == 'prem':
-      prem_games = fetch_prem_today()
-      await message.channel.send(prem_games)
-
-    if msg ==  'store':
-      firestore_interaction.store_data()
-      await message.channel.send('data is stored normally')
-
-
+# Initialize Discord Bot
 intents = discord.Intents.default()
 intents.message_content = True
-client = MyClient(intents=intents)
-DISCORD_TOKEN = os.getenv('TOKEN')
-client.run(str(DISCORD_TOKEN))
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+# Register bot commands
+register_commands(bot)
+
+# Task to check for game updates regularly
+@tasks.loop(minutes=5)
+async def update_game_results():
+    await check_game_updates(bot)
+
+# Start checking game updates when bot is ready
+@bot.event
+async def on_ready():
+    print(f'{bot.user} has connected to Discord!')
+    update_game_results.start()
+
+# Run the bot
+bot.run(TOKEN)
