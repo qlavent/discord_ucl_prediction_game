@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands, tasks
 import os
 from commands import register_commands
+from predict_commands import register_predict_command
+from history_commands import register_history_command
 from game_updates import check_game_updates
 from firestore_db import init_firestore
 from dotenv import load_dotenv
@@ -20,6 +22,8 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Register bot commands
 register_commands(bot)
+register_predict_command(bot)
+register_history_command(bot)
 
 # Task to check for game updates regularly
 @tasks.loop(minutes=5)
