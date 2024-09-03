@@ -84,7 +84,6 @@ def show_upcomming_matches(next_matchday_matches, user_id):
     for match in next_matchday_matches:
         match_id = str(match['id'])
         prediction = get_predictions_user_match(user_id=user_id, match_id=match_id)
-        print(user_id, match_id, prediction)
         match_date = convert_to_belgian_time(match['utcDate']).strftime("%Y-%m-%d")
         match_time = convert_to_belgian_time(match['utcDate']).strftime("%H:%M")
         home_team = match['homeTeam']['name']
