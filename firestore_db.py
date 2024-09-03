@@ -38,7 +38,6 @@ def save_prediction(user_id, match_id, home_goals, away_goals):
             'away_goals': away_goals,
             'points': 1  # You might want to adjust this based on your points logic
         })
-        print(f"Added new prediction for match {match_id} by user {user_id}.")
 
 def get_leaderboard():
     users_ref = db.collection('users')
