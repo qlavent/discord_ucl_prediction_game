@@ -3,6 +3,7 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials, firestore
 import pytz  # Importing pytz for timezone conversion
+from google.cloud.firestore_v1.base_query import FieldFilter
 
 # Initialize Firestore
 db = None
@@ -18,7 +19,8 @@ def save_prediction(user_id, match_id, home_goals, away_goals):
     predictions_ref = db.collection('predictions')
     
     # Query to find if there's already a prediction for this user and match
-    query = predictions_ref.where('user_id', '==', user_id).where('match_id', '==', match_id).limit(1).get()
+    query = predictions_ref.where(filter=FieldFilter('user_id', '==', user_id)).where(filter=FieldFilter('match_id', '==', match_id)).limit(1).get()
+    # query = predictions_ref.where('user_id', '==', user_id).where('match_id', '==', match_id).limit(1).get()
     
     if query:
         # Update the existing prediction
@@ -49,14 +51,16 @@ def get_leaderboard():
     return leaderboard
 
 def get_predictions_match(match_id):
-    predictions_ref = db.collection('predictions').where('match_id', '==', match_id)
+    # predictions_ref = db.collection('predictions').where('match_id', '==', match_id)
+    predictions_ref = db.collection('predictions').where(filter=FieldFilter('match_id', '==', match_id))
     predictions = {}
     for prediction in predictions_ref.stream():
         predictions[prediction.id] = prediction.to_dict()
     return predictions
 
 def get_predictions_user_match(user_id, match_id):
-    predictions_ref = db.collection('predictions').where('user_id', '==', user_id).where('match_id', '==', match_id)
+    # predictions_ref = db.collection('predictions').where('user_id', '==', user_id).where('match_id', '==', match_id)
+    predictions_ref = db.collection('predictions').where(filter=FieldFilter('user_id', '==', user_id)).where(filter=FieldFilter('match_id', '==', match_id))
     prediction = None
     for prediction in predictions_ref.stream():
         prediction = prediction.to_dict()
@@ -114,7 +118,8 @@ def get_past_predictions(user_id, begin_date, end_date):
     end_date = datetime.strptime(end_date, "%d/%m/%Y").date()
 
     # Fetch all predictions for the given user_id
-    predictions_ref = db.collection('predictions').where('user_id', '==', user_id)
+    # predictions_ref = db.collection('predictions').where('user_id', '==', user_id)
+    predictions_ref = db.collection('predictions').where(filter=FieldFilter('user_id', '==', user_id))
     predictions = predictions_ref.stream()
 
     # Use a dictionary to group games by date and time
@@ -207,7 +212,8 @@ def get_users_with_prediction_for_match(match_id):
     predictions_collection_ref = db.collection('predictions')
 
     # Query to find documents where 'match_id' equals the provided match_id
-    query = predictions_collection_ref.where('match_id', '==', match_id)
+    # query = predictions_collection_ref.where('match_id', '==', match_id)
+    query = predictions_collection_ref.where(filter=FieldFilter('match_id', '==', match_id))
 
     # Execute the query and get matching documents
     prediction_documents = query.stream()

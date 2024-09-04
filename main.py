@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 import os
-from commands import register_commands
+from commands import register_commands, register_leaderboard_command, register_uclhelp_command
 from predict_commands import register_predict_command
 from history_commands import register_history_command
 from game_updates import check_game_updates
@@ -21,10 +21,7 @@ init_firestore()
 # Initialize Discord Bot
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix='!', intents=intents)
-
-# Register bot commands
-register_commands(bot)
+bot = commands.Bot(intents=intents)
 
 # Task to check for game updates regularly
 @tasks.loop(minutes=5)
@@ -71,8 +68,16 @@ async def predict(ctx: discord.Interaction):
     await register_predict_command(ctx,bot)
 
 @bot.slash_command(name="history", description="Interactively select a date range to view your past predictions.")
-async def predict(ctx: discord.Interaction):
+async def history(ctx: discord.Interaction):
     await register_history_command(ctx,bot)
+
+@bot.slash_command(name="leaderboard", description=" View the current leaderboard.")
+async def leaderboard(ctx: discord.Interaction):
+    await register_leaderboard_command(ctx,bot)
+
+@bot.slash_command(name="uclhelp", description="Show available commands.")
+async def uclhelp(ctx: discord.Interaction):
+    await register_uclhelp_command(ctx,bot)
 
 # Run the bot
 bot.run(TOKEN)
