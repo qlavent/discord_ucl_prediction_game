@@ -36,7 +36,7 @@ def get_next_matchday_matches():
         # Check if any match is in 'IN_PLAY', 'SCHEDULED', or 'TIMED' status
         unplayed_matches = [
             match for match in match_list
-            if match['status'] in ['SCHEDULED', 'TIMED', 'IN_PLAY']
+            if match['status'] in ['SCHEDULED', 'TIMED']
         ]
         
         # Check if any match is ongoing or scheduled for a future date
@@ -46,7 +46,7 @@ def get_next_matchday_matches():
         ]
         
         # If there are both played and unplayed matches in this stage and matchday, return them
-        if unplayed_matches and len(unplayed_matches) < len(match_list):
+        if unplayed_matches and len(unplayed_matches) < len(match_list) and len(unplayed_matches) > 0:
             return unplayed_matches
 
         # If no matches have been played yet and some are upcoming, return those

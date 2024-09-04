@@ -110,7 +110,7 @@ def update_user_points(user_id, points):
         new_points = user_data.get('points', 0) + points
         user_ref.update({'points': new_points})
     else:
-        user_ref.set({'points': points, 'user_id': user_id})
+        user_ref.set({'points': points, 'user_id': user_id, 'reminders':True})
 
 def get_past_predictions(user_id, begin_date, end_date):
     # Parse the date strings into datetime objects
@@ -230,3 +230,45 @@ def get_users_with_prediction_for_match(match_id):
             user_ids.append(prediction_data['user_id'])
 
     return user_ids
+
+def enable_reminder(user_id):
+    # Query to find user by user_id
+    user_ref = db.collection('users').where(filter=FieldFilter('user_id', '==', user_id))
+    user_docs = user_ref.get()
+
+    if user_docs:  # Check if the list is not empty
+        # Assuming there is only one document matching the user_id
+        user_doc = user_docs[0].reference  # Get the reference to the first (and presumably only) document
+        user_doc.update({'reminders': True})
+    else:
+        # If the user does not exist, create a new document
+        db.collection('users').add({'points': 0, 'user_id': user_id, 'reminders': True})
+
+
+def disable_reminder(user_id):
+    # Query to find user by user_id
+    user_ref = db.collection('users').where(filter=FieldFilter('user_id', '==', user_id))
+    user_docs = user_ref.get()
+
+    if user_docs:  # Check if the list is not empty
+        # Assuming there is only one document matching the user_id
+        user_doc = user_docs[0].reference  # Get the reference to the first (and presumably only) document
+        user_doc.update({'reminders': False})
+    else:
+        # If the user does not exist, create a new document
+        db.collection('users').add({'points': 0, 'user_id': user_id, 'reminders': False})
+
+
+def check_reminder_messages(user_id):
+    # Query to find user by user_id
+    user_ref = db.collection('users').where(filter=FieldFilter('user_id', '==', user_id))
+    user_docs = user_ref.get()
+
+    if not user_docs:  # Check if the list is empty
+        return False  # Return False if no user is found
+
+    # Assuming there is only one document matching the user_id
+    user_data = user_docs[0].to_dict()  # Get the document data as a dictionary
+    return user_data.get('reminders', False)  # Return the value of 'reminders', default to False if not found
+
+        
