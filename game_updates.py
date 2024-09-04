@@ -13,7 +13,7 @@ API_KEY = os.getenv('FOOTBALL_API_KEY')
 async def check_game_updates(bot):
     # Fetch UCL games that have finished
     response = requests.get(
-        'https://api.football-data.org/v4/competitions/PL/matches?status=FINISHED',
+        "https://api.football-data.org/v4/competitions/CL/matches?status=FINISHED",
         headers={'X-Auth-Token': API_KEY}
     )
     matches = response.json().get('matches', [])

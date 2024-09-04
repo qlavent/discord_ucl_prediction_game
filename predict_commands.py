@@ -93,9 +93,9 @@ def show_upcomming_matches(next_matchday_matches, user_id):
             current_date = match_date
             response += f"\n{match_date}:\n"
         if prediction is None:
-            response += f"{match_time}: {home_team}     _-_     {away_team}           match ID: {str(match['id'])}\n"
+            response += f"{match_time}: {home_team}     _-_     {away_team}\n"
         else: 
-            response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**     {away_team}           match ID: {str(match['id'])}\n"
+            response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**     {away_team}\n"
 
     return response
 

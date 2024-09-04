@@ -12,16 +12,14 @@ API_KEY = os.getenv('FOOTBALL_API_KEY')
 def get_next_matchday_matches():
     # Fetch all matches with relevant statuses
     response = requests.get(
-        "https://api.football-data.org/v4/competitions/PL/matches",
+        "https://api.football-data.org/v4/competitions/CL/matches",
         headers={'X-Auth-Token': API_KEY}
     )
+
     # Parse response
     matches = response.json().get('matches', [])
     if not matches:
         return []
-
-    # Sort matches by stage and matchday to find the next matchday
-    matches.sort(key=lambda match: (match['stage'], match['matchday']))
     
     # Group matches by stage and matchday combination
     grouped_matches = {}
@@ -30,26 +28,30 @@ def get_next_matchday_matches():
         if key not in grouped_matches:
             grouped_matches[key] = []
         grouped_matches[key].append(match)
+
     # Find the current date and time in UTC
     current_time = datetime.utcnow().replace(tzinfo=pytz.utc)
     
-    # Iterate through sorted matchdays to find the next set of unplayed matches
     for (stage, matchday), match_list in grouped_matches.items():
+        # Check if any match is in 'IN_PLAY', 'SCHEDULED', or 'TIMED' status
         unplayed_matches = [
             match for match in match_list
-            if match['status'] in ['SCHEDULED', 'TIMED']
+            if match['status'] in ['SCHEDULED', 'TIMED', 'IN_PLAY']
         ]
-        if unplayed_matches:
-            # If there are unplayed matches in this stage and matchday, return them
-            return unplayed_matches
         
-        # If we are still in an ongoing matchday with partially played games, show remaining
-        ongoing_matches = [
+        # Check if any match is ongoing or scheduled for a future date
+        ongoing_or_future_matches = [
             match for match in match_list
-            if match['status'] == 'IN_PLAY' or match['utcDate'] > current_time.isoformat()
+            if match['status'] == 'IN_PLAY' or datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc) > current_time
         ]
-        if ongoing_matches:
-            return ongoing_matches
+        
+        # If there are both played and unplayed matches in this stage and matchday, return them
+        if unplayed_matches and len(unplayed_matches) < len(match_list):
+            return unplayed_matches
+
+        # If no matches have been played yet and some are upcoming, return those
+        if ongoing_or_future_matches:
+            return unplayed_matches
 
     # If no ongoing or unplayed matches found, return an empty list
     return []

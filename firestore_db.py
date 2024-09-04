@@ -172,3 +172,55 @@ def get_past_predictions(user_id, begin_date, end_date):
                 })
 
     return result
+
+def get_users_without_predictions(match_id):
+    # Replace with actual Firestore logic to get user predictions
+    all_users = get_all_registered_users()  # Assume this function returns a list of user IDs
+    users_with_predictions = get_users_with_prediction_for_match(match_id)  # Assume this returns a list of user IDs who have predicted
+    
+    users_without_predictions = [user for user in all_users if user not in users_with_predictions]
+    
+    return users_without_predictions
+
+def get_all_registered_users():
+    # Reference to the 'users' collection
+    users_collection_ref = db.collection('users')
+
+    # Get all documents from the 'users' collection
+    user_documents = users_collection_ref.stream()
+
+    # List to store user IDs
+    user_ids = []
+
+    # Iterate through each document
+    for user_doc in user_documents:
+        user_data = user_doc.to_dict()
+        
+        # Check if the 'user_id' key exists in the document
+        if 'user_id' in user_data:
+            user_ids.append(user_data['user_id'])
+
+    return user_ids
+
+def get_users_with_prediction_for_match(match_id):
+    # Reference to the 'predictions' collection
+    predictions_collection_ref = db.collection('predictions')
+
+    # Query to find documents where 'match_id' equals the provided match_id
+    query = predictions_collection_ref.where('match_id', '==', match_id)
+
+    # Execute the query and get matching documents
+    prediction_documents = query.stream()
+
+    # List to store user IDs
+    user_ids = []
+
+    # Iterate through each document
+    for prediction_doc in prediction_documents:
+        prediction_data = prediction_doc.to_dict()
+        
+        # Check if the 'user_id' key exists in the document
+        if 'user_id' in prediction_data:
+            user_ids.append(prediction_data['user_id'])
+
+    return user_ids
