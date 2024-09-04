@@ -13,7 +13,8 @@ class DateSelectionView(View):
         self.bot = bot
         self.begin_date = None
         self.end_date = None
-        self.message = None  # To store the original message
+        self.message_id = None  # Store the message ID
+        self.message = None
 
     @discord.ui.button(label='Set Begin Date', style=discord.ButtonStyle.primary)
     async def set_begin_date(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -56,6 +57,12 @@ class DateSelectionView(View):
             past_predictions = get_past_predictions(self.user_id, self.begin_date.strftime("%d/%m/%Y"), self.end_date.strftime("%d/%m/%Y"))
             if not past_predictions:
                 await interaction.response.send_message(f"{user.display_name}, you have no past predictions in the specified time range.", ephemeral=True)
+                for item in self.children:
+                    item.disabled = True
+                await self.message.edit(view=self)  # Edit the original UI message
+
+                await self.message.delete()
+                return
             else:
                 response = f"{user.display_name}, your Past Predictions:\n"
                 for date, times in past_predictions.items():
@@ -69,13 +76,14 @@ class DateSelectionView(View):
                             predicted_score = f"{game['predicted_home_goals']}-{game['predicted_away_goals']}"
                             points = game['points']
                             response += f"    {home_team} vs {away_team}: Predicted {predicted_score}, Actual {actual_score}, Points: {points}\n"
-                await interaction.response.send_message(response, ephemeral=True)
+                await interaction.response.send_message(response, ephemeral=False)
 
-            # Disable the buttons after the history is returned
-            for item in self.children:
-                item.disabled = True
-            if self.message:
+                # Disable the buttons after the history is returned
+                for item in self.children:
+                    item.disabled = True
                 await self.message.edit(view=self)  # Edit the original UI message
+                await self.message.delete()
+
         else:
             await interaction.response.send_message("Please set both begin and end dates before getting the history.", ephemeral=True)
 
@@ -83,4 +91,7 @@ async def register_history_command(ctx: discord.Interaction, bot: commands.Bot):
     user_id = str(ctx.user.id)
     view = DateSelectionView(ctx, user_id, bot)
     message = "Click the buttons below to set your dates and get your history."
-    view.message = await ctx.response.send_message(message, view=view, ephemeral=True)
+    # Send a non-ephemeral message so it can be updated
+    msg = await ctx.send(message, view=view)
+    view.message = msg
+
