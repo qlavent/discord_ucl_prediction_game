@@ -40,6 +40,8 @@ class DateSelectionView(View):
             await interaction.followup.send("Invalid date format. Please use dd/mm/yyyy.", ephemeral=True)
         except asyncio.TimeoutError:
             await interaction.followup.send("You took too long to respond.", ephemeral=True)
+            await self.message.delete()
+            return
 
     @discord.ui.button(label='Set End Date', style=discord.ButtonStyle.primary)
     async def set_end_date(self, button: discord.ui.Button, interaction: discord.Interaction):
@@ -60,6 +62,8 @@ class DateSelectionView(View):
             await interaction.followup.send("Invalid date format. Please use dd/mm/yyyy.", ephemeral=True)
         except asyncio.TimeoutError:
             await interaction.followup.send("You took too long to respond.", ephemeral=True)
+            await self.message.delete()
+            return
 
     @discord.ui.button(label='Get History', style=discord.ButtonStyle.green)
     async def get_history(self, button: discord.ui.Button, interaction: discord.Interaction):

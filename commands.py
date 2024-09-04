@@ -55,10 +55,10 @@ async def register_leaderboard_command(ctx, bot):
 
 async def register_uclhelp_command(ctx, bot):
     response = (
-        "!predict - Show games available for prediction.\n"
-        "!leaderboard - View the current leaderboard.\n"
-        "!history - Interactively select a date range to view your past predictions.\n"
-        "!uclhelp - Show available commands.\n"
+        "/predict - Show games available for prediction.\n"
+        "/leaderboard - View the current leaderboard.\n"
+        "/history - Interactively select a date range to view your past predictions.\n"
+        "/help - Show available commands.\n"
     )
     await ctx.response.send_message(response)
 

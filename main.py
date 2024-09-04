@@ -75,7 +75,7 @@ async def history(ctx: discord.Interaction):
 async def leaderboard(ctx: discord.Interaction):
     await register_leaderboard_command(ctx,bot)
 
-@bot.slash_command(name="uclhelp", description="Show available commands.")
+@bot.slash_command(name="help", description="Show available commands.")
 async def uclhelp(ctx: discord.Interaction):
     await register_uclhelp_command(ctx,bot)
 
