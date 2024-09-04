@@ -11,6 +11,7 @@ class MatchSelectView(View):
         self.bot = bot
         self.matches = matches
         self.selected_match_id = None
+        self.message = None  # To store the original message
 
         options = [discord.SelectOption(label=f"{match['homeTeam']['name']} vs {match['awayTeam']['name']}", value=str(match['id'])) for match in matches]
         id_to_home_team = {str(match['id']): match['homeTeam']['name'] for match in matches}
@@ -116,7 +117,8 @@ async def register_predict_command(ctx,bot):
 
     # Send the message with the match list and then add the dropdown
     view = MatchSelectView(ctx, user_id, bot, next_matchday_matches)
-    await ctx.respond(matches_message, view=view)
+    view.message = await ctx.response.send_message(matches_message, view=view, ephemeral=True)
     
     # Optionally, you can delete the user's command message if needed
     # await ctx.message.delete()
+
