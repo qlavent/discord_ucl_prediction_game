@@ -25,8 +25,6 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 # Register bot commands
 register_commands(bot)
-register_predict_command(bot)
-register_history_command(bot)
 
 # Task to check for game updates regularly
 @tasks.loop(minutes=5)
@@ -67,6 +65,14 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     update_game_results.start()
     send_prediction_reminders.start()
+
+@bot.slash_command(name="predict", description="Predict the Champions League match results.")
+async def predict(ctx: discord.Interaction):
+    await register_predict_command(ctx,bot)
+
+@bot.slash_command(name="history", description="Interactively select a date range to view your past predictions.")
+async def predict(ctx: discord.Interaction):
+    await register_history_command(ctx,bot)
 
 # Run the bot
 bot.run(TOKEN)

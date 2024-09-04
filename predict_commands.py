@@ -105,20 +105,18 @@ def show_upcoming_matches(next_matchday_matches, user_id):
 
     return response
 
-def register_predict_command(bot):
-    @bot.command(name='predict')
-    async def predict(ctx):
-        user_id = str(ctx.author.id)
-        next_matchday_matches = get_next_matchday_matches()
-        if not next_matchday_matches:
-            await ctx.send("No upcoming or ongoing matches found.", ephemeral=True)
-            return
-        
-        matches_message = show_upcoming_matches(next_matchday_matches, user_id)
+async def register_predict_command(ctx,bot):
+    user_id = str(ctx.author.id)
+    next_matchday_matches = get_next_matchday_matches()
+    if not next_matchday_matches:
+        await ctx.respond("No upcoming or ongoing matches found.")
+        return
+    
+    matches_message = show_upcoming_matches(next_matchday_matches, user_id)
 
-        # Send the message with the match list and then add the dropdown
-        view = MatchSelectView(ctx, user_id, bot, next_matchday_matches)
-        await ctx.send(matches_message, view=view, ephemeral=True)
-        
-        # Delete the user's command message to keep the chat clean
-        await ctx.message.delete()
+    # Send the message with the match list and then add the dropdown
+    view = MatchSelectView(ctx, user_id, bot, next_matchday_matches)
+    await ctx.respond(matches_message, view=view)
+    
+    # Optionally, you can delete the user's command message if needed
+    # await ctx.message.delete()
