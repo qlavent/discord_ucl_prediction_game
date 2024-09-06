@@ -11,6 +11,7 @@ from football_api import get_next_matchday_matches, convert_to_belgian_time
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from pytz import utc
+from keep_alive import keep_alive
 
 # Load environment variables
 load_dotenv()
@@ -111,4 +112,5 @@ async def register(interaction: discord.Interaction):
     await interaction.response.send_message(message, ephemeral=True)
 
 # Run the bot
+keep_alive()
 bot.run(TOKEN)
