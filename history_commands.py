@@ -106,7 +106,7 @@ class DateSelectionView(View):
             await interaction.response.send_message("Please set both begin and end dates before getting the history.", ephemeral=True)
 
 async def register_history_command(ctx: discord.Interaction, bot: commands.Bot):
-    user_id = str(ctx.author.id)
+    user_id = str(ctx.user.id)
 
     # view = DateSelectionView(ctx, user_id, bot)
     # await view.start()  # Start the view and send the initial message

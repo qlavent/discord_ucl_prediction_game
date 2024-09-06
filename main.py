@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands, tasks
+from discord import app_commands
 import os
 from commands import register_commands, register_leaderboard_command, register_uclhelp_command
 from predict_commands import register_predict_command
@@ -18,12 +19,13 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 # Initialize Firestore
 init_firestore()
 
-# Set up intents (adjust if needed)
+# Set up intents
 intents = discord.Intents.default()
 intents.message_content = True  # Adjust based on your bot's needs
 
-# Initialize the bot with slash command support
+# Initialize the bot
 bot = commands.Bot(command_prefix="", intents=intents)
+tree = bot.tree  # This handles slash commands
 
 # Task to check for game updates regularly
 @tasks.loop(minutes=5)
@@ -64,47 +66,49 @@ async def send_prediction_reminders():
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    await tree.sync()  # Sync slash commands with Discord
     update_game_results.start()
     send_prediction_reminders.start()
 
-@bot.slash_command(name="predict", description="Predict the Champions League match results.")
-async def predict(ctx: discord.Interaction):
-    user_id = str(ctx.author.id)
+# Define slash commands using app_commands.command decorator
+@tree.command(name="predict", description="Predict the Champions League match results.")
+async def predict(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
     enable_reminder(user_id)
-    await register_predict_command(ctx,bot)
+    await register_predict_command(interaction, bot)
 
-@bot.slash_command(name="history", description="Interactively select a date range to view your past predictions.")
-async def history(ctx: discord.Interaction):
-    await register_history_command(ctx,bot)
+@tree.command(name="history", description="Interactively select a date range to view your past predictions.")
+async def history(interaction: discord.Interaction):
+    await register_history_command(interaction, bot)
 
-@bot.slash_command(name="leaderboard", description=" View the current leaderboard.")
-async def leaderboard(ctx: discord.Interaction):
-    await register_leaderboard_command(ctx,bot)
+@tree.command(name="leaderboard", description="View the current leaderboard.")
+async def leaderboard(interaction: discord.Interaction):
+    await register_leaderboard_command(interaction, bot)
 
-@bot.slash_command(name="help", description="Show available commands.")
-async def uclhelp(ctx: discord.Interaction):
-    await register_uclhelp_command(ctx,bot)
+@tree.command(name="help", description="Show available commands.")
+async def uclhelp(interaction: discord.Interaction):
+    await register_uclhelp_command(interaction, bot)
 
-@bot.slash_command(name="enable_messages", description="Enable to send reminder messages for the prediction.")
-async def enable_discord_reminder(ctx: discord.Interaction):
-    user_id = str(ctx.author.id)
+@tree.command(name="enable_messages", description="Enable reminder messages for the prediction.")
+async def enable_discord_reminder(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
     enable_reminder(user_id)
-    message = "The bot is now enabled to send reminder messages"
-    await ctx.response.send_message(message,ephemeral=True)
+    message = "The bot is now enabled to send reminder messages."
+    await interaction.response.send_message(message, ephemeral=True)
 
-@bot.slash_command(name="disable_messages", description="Disable to send reminder messages for the prediction.")
-async def disable_discord_reminder(ctx: discord.Interaction):
-    user_id = str(ctx.author.id)
+@tree.command(name="disable_messages", description="Disable reminder messages for the prediction.")
+async def disable_discord_reminder(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
     disable_reminder(user_id)
-    message = "The bot is now disabled to send reminder messages"
-    await ctx.response.send_message(message,ephemeral=True)
+    message = "The bot is now disabled to send reminder messages."
+    await interaction.response.send_message(message, ephemeral=True)
 
-@bot.slash_command(name="register", description="Register to be part of the prediction game.")
-async def register(ctx: discord.Interaction):
-    user_id = str(ctx.author.id)
+@tree.command(name="register", description="Register to be part of the prediction game.")
+async def register(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
     enable_reminder(user_id)
-    message = "You are now registered in the UCL prediction game. Your reminder messages are currently enabled"
-    await ctx.response.send_message(message,ephemeral=True)
+    message = "You are now registered in the UCL prediction game. Your reminder messages are currently enabled."
+    await interaction.response.send_message(message, ephemeral=True)
 
 # Run the bot
 bot.run(TOKEN)

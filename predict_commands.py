@@ -107,7 +107,7 @@ def show_upcoming_matches(next_matchday_matches, user_id):
     return response
 
 async def register_predict_command(ctx,bot):
-    user_id = str(ctx.author.id)
+    user_id = str(ctx.user.id)
     next_matchday_matches = get_next_matchday_matches()
     if not next_matchday_matches:
         await ctx.respond("No upcoming or ongoing matches found.")
