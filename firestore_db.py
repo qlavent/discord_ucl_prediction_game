@@ -4,13 +4,35 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import pytz  # Importing pytz for timezone conversion
 from google.cloud.firestore_v1.base_query import FieldFilter
+from dotenv import load_dotenv
+import os
 
 # Initialize Firestore
 db = None
 
+# Load environment variables from .env file
+load_dotenv()
+
 def init_firestore():
     global db
-    cred = credentials.Certificate("discord-ucl-prediction-game-firebase-adminsdk-a7j85-104cd7d712.json")
+    
+    # Retrieve Firestore credential details from environment variables
+    cred_data = {
+        "type": "service_account",
+        "project_id": os.getenv("FIREBASE_PROJECT_ID"),
+        "private_key_id": os.getenv("FIREBASE_PRIVATE_KEY_ID"),
+        "private_key": os.getenv("FIREBASE_PRIVATE_KEY").replace("\\n", "\n"),  # Handle line breaks in keys
+        "client_email": os.getenv("FIREBASE_CLIENT_EMAIL"),
+        "client_id": os.getenv("FIREBASE_CLIENT_ID"),
+        "auth_uri": os.getenv("FIREBASE_AUTH_URI"),
+        "token_uri": os.getenv("FIREBASE_TOKEN_URI"),
+        "auth_provider_x509_cert_url": os.getenv("FIREBASE_AUTH_PROVIDER_CERT_URL"),
+        "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_CERT_URL"),
+        "universe_domain": "googleapis.com"
+    }
+
+    # Initialize Firestore using environment variables
+    cred = credentials.Certificate(cred_data)
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 
