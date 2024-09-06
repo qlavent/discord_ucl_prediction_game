@@ -18,10 +18,12 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 # Initialize Firestore
 init_firestore()
 
-# Initialize Discord Bot
+# Set up intents (adjust if needed)
 intents = discord.Intents.default()
-intents.message_content = True
-bot = commands.Bot(intents=intents)
+intents.message_content = True  # Adjust based on your bot's needs
+
+# Initialize the bot with slash command support
+bot = discord.Bot(intents=intents)
 
 # Task to check for game updates regularly
 @tasks.loop(minutes=5)
