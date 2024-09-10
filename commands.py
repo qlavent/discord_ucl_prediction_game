@@ -59,6 +59,9 @@ async def register_uclhelp_command(ctx, bot):
         "/leaderboard - View the current leaderboard.\n"
         "/history - Interactively select a date range to view your past predictions.\n"
         "/help - Show available commands.\n"
+        "/register - Register to be part of the prediction game."
+        "/enable_messages - Enable reminder messages for the prediction."
+        "/dissable_messages - Dissable reminder messages for the prediction."
     )
     await ctx.response.send_message(response)
 
