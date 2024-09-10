@@ -12,7 +12,7 @@ API_KEY = os.getenv('FOOTBALL_API_KEY')
 def get_next_matchday_matches():
     # Fetch all matches with relevant statuses
     response = requests.get(
-        "https://api.football-data.org/v4/competitions/CL/matches",
+        "https://api.football-data.org/v4/competitions/PL/matches",
         headers={'X-Auth-Token': API_KEY}
     )
 
