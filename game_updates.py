@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 API_KEY = os.getenv('FOOTBALL_API_KEY')
+channel_id = int(os.getenv('DISCORD_CHANNEL_ID'))
 
 async def check_game_updates(bot):
     # Fetch UCL games that have finished
@@ -44,7 +45,9 @@ async def check_game_updates(bot):
             result_message += f"<@{user_id}> predicted {predicted_home}-{predicted_away}, earned {points} points\n"
 
         # Send result and updated leaderboard to a specific channel
-        channel = bot.get_channel(int(os.getenv('DISCORD_CHANNEL_ID')))
+        print(channel_id)
+        channel = bot.get_channel(channel_id)
+        print(channel)
         await channel.send(result_message)
         await send_leaderboard(bot)
 
@@ -68,7 +71,7 @@ async def send_leaderboard(bot):
             leaderboard_message += f"{i + 1}) {user.display_name}: {points}pts\n"
 
     # Send the formatted leaderboard message to a specific channel
-    channel = bot.get_channel(int(os.getenv('DISCORD_CHANNEL_ID')))
+    channel = bot.get_channel(channel_id)
     await channel.send(leaderboard_message)
 
 def calculate_points(actual_home, actual_away, predicted_home, predicted_away):
