@@ -105,10 +105,16 @@ def show_upcoming_matches(next_matchday_matches, user_id):
         if match_date != current_date:
             current_date = match_date
             response += f"\n{match_date}:\n"
-        if prediction is None:
-            response += f"{match_time}: {home_team}     _-_  ({home_score}-{away_score})    {away_team}\n"
+        if match['status'] == 'IN_PLAY':
+            if prediction is None:
+                response += f"{match_time}: {home_team}     _-_  ({home_score}-{away_score})    {away_team}\n"
+            else:
+                response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**  ({home_score}-{away_score})     {away_team}\n"
         else:
-            response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**  ({home_score}-{away_score})     {away_team}\n"
+            if prediction is None:
+                response += f"{match_time}: {home_team}     _-_    {away_team}\n"
+            else:
+                response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**     {away_team}\n"
 
     return response
 
