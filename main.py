@@ -25,7 +25,7 @@ intents = discord.Intents.default()
 intents.message_content = True  # Adjust based on your bot's needs
 
 # Initialize the bot
-bot = commands.Bot(command_prefix="", intents=intents)
+bot = commands.Bot(command_prefix="command is", intents=intents)
 tree = bot.tree  # This handles slash commands
 
 # Task to check for game updates regularly

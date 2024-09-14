@@ -6,14 +6,14 @@ from firestore_db import get_past_predictions
 from datetime import datetime
 
 class DateSelectionView(View):
-    def __init__(self, ctx: discord.Interaction, user_id: str, bot: commands.Bot):
+    def __init__(self, interaction: discord.Interaction, user_id: str, bot: commands.Bot):
         super().__init__()
-        self.ctx = ctx
+        self.interaction = interaction
         self.user_id = user_id
         self.bot = bot
         self.begin_date = None
         self.end_date = None
-        self.message = None # To store the original message
+        self.message = None  # To store the original message
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != int(self.user_id):
@@ -22,16 +22,16 @@ class DateSelectionView(View):
         return True
 
     @discord.ui.button(label='Set Begin Date', style=discord.ButtonStyle.primary)
-    async def set_begin_date(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def set_begin_date(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.interaction_check(interaction):
             return
-        
         await interaction.response.send_message("Please enter the begin date in dd/mm/yyyy format.", ephemeral=True)
+
         try:
             msg = await self.bot.wait_for(
                 'message',
                 timeout=60.0,
-                check=lambda m: m.author == self.ctx.user and m.channel == self.ctx.channel
+                check=lambda m: m.author == interaction.user and m.channel == interaction.channel
             )
             self.begin_date = datetime.strptime(msg.content, "%d/%m/%Y").date()
             await msg.delete()
@@ -40,20 +40,21 @@ class DateSelectionView(View):
             await interaction.followup.send("Invalid date format. Please use dd/mm/yyyy.", ephemeral=True)
         except asyncio.TimeoutError:
             await interaction.followup.send("You took too long to respond.", ephemeral=True)
-            await self.message.delete()
+            if self.message:
+                await self.message.delete()
             return
 
     @discord.ui.button(label='Set End Date', style=discord.ButtonStyle.primary)
-    async def set_end_date(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def set_end_date(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not await self.interaction_check(interaction):
             return
-        
         await interaction.response.send_message("Please enter the end date in dd/mm/yyyy format.", ephemeral=True)
+
         try:
             msg = await self.bot.wait_for(
                 'message',
                 timeout=60.0,
-                check=lambda m: m.author == self.ctx.user and m.channel == self.ctx.channel
+                check=lambda m: m.author == interaction.user and m.channel == interaction.channel
             )
             self.end_date = datetime.strptime(msg.content, "%d/%m/%Y").date()
             await msg.delete()
@@ -62,24 +63,22 @@ class DateSelectionView(View):
             await interaction.followup.send("Invalid date format. Please use dd/mm/yyyy.", ephemeral=True)
         except asyncio.TimeoutError:
             await interaction.followup.send("You took too long to respond.", ephemeral=True)
-            await self.message.delete()
+            if self.message:
+                await self.message.delete()
             return
 
     @discord.ui.button(label='Get History', style=discord.ButtonStyle.green)
-    async def get_history(self, button: discord.ui.Button, interaction: discord.Interaction):
-        if not await self.interaction_check(interaction):
-            return
-        
+    async def get_history(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.begin_date and self.end_date:
             user = await self.bot.fetch_user(self.user_id)
             past_predictions = get_past_predictions(self.user_id, self.begin_date.strftime("%d/%m/%Y"), self.end_date.strftime("%d/%m/%Y"))
             if not past_predictions:
                 await interaction.response.send_message(f"{user.display_name}, you have no past predictions in the specified time range.", ephemeral=True)
-                # Disable the buttons after the history is returned
                 for item in self.children:
                     item.disabled = True
-                await self.message.edit(view=self)  # Edit the original UI message
-                await self.message.delete()
+                if self.message:
+                    await self.message.edit(view=self)
+                    await self.message.delete()
                 return
 
             response = f"{user.display_name}, your Past Predictions:\n"
@@ -96,22 +95,28 @@ class DateSelectionView(View):
                         response += f"    {home_team} vs {away_team}: Predicted {predicted_score}, Actual {actual_score}, Points: {points}\n"
             await interaction.response.send_message(response, ephemeral=False)
 
-            # Disable the buttons after the history is returned
             for item in self.children:
                 item.disabled = True
-            await self.message.edit(view=self)  # Edit the original UI message
-            await self.message.delete()
-
+            if self.message:
+                await self.message.edit(view=self)  # Edit the original UI message
+                await self.message.delete()
         else:
             await interaction.response.send_message("Please set both begin and end dates before getting the history.", ephemeral=True)
 
-async def register_history_command(ctx: discord.Interaction, bot: commands.Bot):
-    user_id = str(ctx.user.id)
+async def register_history_command(interaction: discord.Interaction, bot: commands.Bot):
+    user_id = str(interaction.user.id)
 
-    # view = DateSelectionView(ctx, user_id, bot)
-    # await view.start()  # Start the view and send the initial message
-
-    # Send the message with the match list and then add the dropdown
-    view = DateSelectionView(ctx, user_id, bot)
-    message = "Click the buttons below to set your dates and get your history."
-    await ctx.response.send_message(message, view=view)
+    view = DateSelectionView(interaction, user_id, bot)
+    
+    # Send the initial message to acknowledge the interaction
+    await interaction.response.send_message(
+        "Click the buttons below to set your dates and get your history.",
+        ephemeral=True  # Make this response ephemeral
+    )
+    
+    # Send the actual message with the buttons and store it in `view.message`
+    view.message = await interaction.followup.send(
+        "Click the buttons below to set your dates and get your history.",
+        view=view,
+        ephemeral=True
+    )
