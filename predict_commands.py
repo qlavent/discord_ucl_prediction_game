@@ -105,7 +105,7 @@ def show_upcoming_matches(next_matchday_matches, user_id):
         if match_date != current_date:
             current_date = match_date
             response += f"\n{match_date}:\n"
-        if match['status'] == 'IN_PLAY':
+        if match['status'] == 'IN_PLAY' or match['status'] == 'PAUSED':
             if prediction is None:
                 response += f"{match_time}: {home_team}     _-_  ({home_score}-{away_score})    {away_team}\n"
             else:
