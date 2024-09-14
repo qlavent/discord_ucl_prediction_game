@@ -95,15 +95,20 @@ def show_upcoming_matches(next_matchday_matches, user_id):
         match_time = convert_to_belgian_time(match['utcDate']).strftime("%H:%M")
         home_team = match['homeTeam']['name']
         away_team = match['awayTeam']['name']
-        print(home_team +' '+away_team)
+        home_score = 0
+        away_score = 0
+        if match['status'] == 'IN_PLAY':
+            home_score = match['score']['fullTime']['home']
+            away_score = match['score']['fullTime']['away']
+
 
         if match_date != current_date:
             current_date = match_date
             response += f"\n{match_date}:\n"
         if prediction is None:
-            response += f"{match_time}: {home_team}     _-_     {away_team}\n"
+            response += f"{match_time}: {home_team}     _-_  ({home_score}-{away_score})    {away_team}\n"
         else:
-            response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**     {away_team}\n"
+            response += f"{match_time}: {home_team}     **{prediction['home_goals']}-{prediction['away_goals']}**  ({home_score}-{away_score})     {away_team}\n"
 
     return response
 
