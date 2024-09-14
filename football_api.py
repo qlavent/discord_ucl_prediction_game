@@ -42,7 +42,7 @@ def get_next_matchday_matches():
         # Check if any match is ongoing or scheduled for a future date
         ongoing_or_future_matches = [
             match for match in match_list
-            if match['status'] == 'IN_PLAY' or datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc) > current_time
+            if match['status'] == 'IN_PLAY' or match['status'] == 'PAUSED'  or datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc) > current_time
         ]
         
         # If there are both played and unplayed matches in this stage and matchday, return them

@@ -97,7 +97,7 @@ def show_upcoming_matches(next_matchday_matches, user_id):
         away_team = match['awayTeam']['name']
         home_score = 0
         away_score = 0
-        if match['status'] == 'IN_PLAY':
+        if match['status'] == 'IN_PLAY' or match['status'] == 'PAUSED':
             home_score = match['score']['fullTime']['home']
             away_score = match['score']['fullTime']['away']
 
