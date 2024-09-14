@@ -38,7 +38,7 @@ async def update_game_results():
 async def send_prediction_reminders():
     print('running loop')
     now = datetime.utcnow().replace(tzinfo=utc)
-    next_matchday_matches = get_next_matchday_matches()
+    next_matchday_matches, ongoing_matches = get_next_matchday_matches()
 
     for match in next_matchday_matches:
         match_time = convert_to_belgian_time(match['utcDate'])

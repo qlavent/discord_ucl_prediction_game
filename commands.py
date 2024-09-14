@@ -8,7 +8,7 @@ from firestore_db import (
     get_predictions_user_match,
     get_past_predictions
 )
-from football_api import get_next_matchday_matches, convert_to_belgian_time
+from football_api import convert_to_belgian_time
 from datetime import datetime
 
 
@@ -59,9 +59,9 @@ async def register_uclhelp_command(ctx, bot):
         "/leaderboard - View the current leaderboard.\n"
         "/history - Interactively select a date range to view your past predictions.\n"
         "/help - Show available commands.\n"
-        "/register - Register to be part of the prediction game."
-        "/enable_messages - Enable reminder messages for the prediction."
-        "/dissable_messages - Dissable reminder messages for the prediction."
+        "/register - Register to be part of the prediction game.\n"
+        "/enable_messages - Enable reminder messages for the prediction.\n"
+        "/dissable_messages - Dissable reminder messages for the prediction.\n"
     )
     await ctx.response.send_message(response)
 

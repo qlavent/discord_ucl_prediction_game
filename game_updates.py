@@ -45,9 +45,7 @@ async def check_game_updates(bot):
             result_message += f"<@{user_id}> predicted {predicted_home}-{predicted_away}, earned {points} points\n"
 
         # Send result and updated leaderboard to a specific channel
-        print(channel_id)
         channel = bot.get_channel(channel_id)
-        print(channel)
         await channel.send(result_message)
         await send_leaderboard(bot)
 
@@ -55,7 +53,7 @@ async def send_leaderboard(bot):
     # Fetch and sort leaderboard data
     leaderboard_data = get_leaderboard()
     sorted_leaderboard = sorted(leaderboard_data.items(), key=lambda x: x[1], reverse=True)
-
+    
     # Initialize leaderboard message
     leaderboard_message = "Updated Leaderboard:\n"
     

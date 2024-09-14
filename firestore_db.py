@@ -125,14 +125,26 @@ def update_game_result(match_id, home_score, away_score, match_date, home_team, 
     return False
 
 def update_user_points(user_id, points):
-    user_ref = db.collection('users').document(user_id)
-    user = user_ref.get()
-    if user.exists:
-        user_data = user.to_dict()
-        new_points = user_data.get('points', 0) + points
-        user_ref.update({'points': new_points})
+    # Query to find user by user_id
+    user_ref = db.collection('users').where(filter=FieldFilter('user_id', '==', user_id))
+    user_docs = user_ref.get()
+
+    if user_docs:  # Check if the list is not empty
+        # Assuming there is only one document matching the user_id
+        user_doc = user_docs[0].reference  # Get the reference to the first (and presumably only) document
+        user_snapshot = user_doc.get()  # Retrieve the document snapshot
+
+        if user_snapshot.exists:  # Check if the document exists
+            user_data = user_snapshot.to_dict()  # Convert the snapshot to a dictionary
+            new_points = user_data.get('points', 0) + points
+            user_doc.update({'points': new_points})
+        else:
+            # If the document somehow doesn't exist, create a new one
+            db.collection('users').add({'points': points, 'user_id': user_id, 'reminders': True})
     else:
-        user_ref.set({'points': points, 'user_id': user_id, 'reminders':True})
+        # If the user does not exist, create a new document
+        db.collection('users').add({'points': points, 'user_id': user_id, 'reminders': True})
+
 
 def get_past_predictions(user_id, begin_date, end_date):
     # Parse the date strings into datetime objects
