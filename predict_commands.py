@@ -125,7 +125,7 @@ async def register_predict_command(ctx,bot):
         await ctx.response.send_message("No upcoming or ongoing matches found.")
         return
     matches_message = show_upcoming_matches(ongoing_matches, user_id)
-    print(next_matchday_matches)
+    print('the next matches are',next_matchday_matches)
     # Send the message with the match list and then add the dropdown
     view = MatchSelectView(ctx, user_id, bot, next_matchday_matches)
     view.message = await ctx.response.send_message(matches_message, view=view, ephemeral=True)
