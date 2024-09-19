@@ -47,10 +47,12 @@ def get_next_matchday_matches():
         
         # If there are both played and unplayed matches in this stage and matchday, return them
         if unplayed_matches and len(unplayed_matches) < len(match_list) and len(unplayed_matches) > 0:
+            print(unplayed_matches)
             return unplayed_matches, ongoing_or_future_matches
 
         # If no matches have been played yet and some are upcoming, return those
         if ongoing_or_future_matches:
+            print(ongoing_or_future_matches)
             return unplayed_matches, ongoing_or_future_matches
 
     # If no ongoing or unplayed matches found, return an empty list
