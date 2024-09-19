@@ -122,7 +122,7 @@ async def register_predict_command(ctx,bot):
     user_id = str(ctx.user.id)
     next_matchday_matches, ongoing_matches = get_next_matchday_matches()
     if not next_matchday_matches:
-        await ctx.respond("No upcoming or ongoing matches found.")
+        await ctx.response.send_message("No upcoming or ongoing matches found.")
         return
     matches_message = show_upcoming_matches(ongoing_matches, user_id)
 
