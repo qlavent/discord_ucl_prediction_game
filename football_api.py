@@ -55,7 +55,7 @@ def get_next_matchday_matches():
 
          # If no matches have been played yet and some are upcoming, return those
         if ongoing_or_future_matches:
-            return ongoing_or_future_matches , ongoing_or_future_matches
+            return unplayed_matches, ongoing_or_future_matches
 
     # If no ongoing or unplayed matches found, return an empty list
     return [],[]
