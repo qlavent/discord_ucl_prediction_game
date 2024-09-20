@@ -44,14 +44,13 @@ def get_next_matchday_matches():
             match for match in match_list
             if match['status'] == 'IN_PLAY' or match['status'] == 'PAUSED'  or datetime.strptime(match['utcDate'], '%Y-%m-%dT%H:%M:%SZ').replace(tzinfo=pytz.utc) > current_time
         ]
-        
         # If there are both played and unplayed matches in this stage and matchday, return them
-        if unplayed_matches and len(unplayed_matches) < len(match_list) and len(unplayed_matches) > 0:
+        if (unplayed_matches and len(unplayed_matches) < len(match_list) and len(unplayed_matches) > 0) or (len(unplayed_matches) == 0 and len(ongoing_or_future_matches) > 0):
             return unplayed_matches, ongoing_or_future_matches
 
          # If no matches have been played yet and some are upcoming, return those
         if ongoing_or_future_matches:
-            return [], ongoing_or_future_matches
+            return unplayed_matches, ongoing_or_future_matches
 
     # If no ongoing or unplayed matches found, return an empty list
     return [],[]

@@ -16,7 +16,8 @@ class MatchSelectView(View):
         options = [discord.SelectOption(label=f"{match['homeTeam']['name']} vs {match['awayTeam']['name']}", value=str(match['id'])) for match in matches]
         id_to_home_team = {str(match['id']): match['homeTeam']['name'] for match in matches}
         id_to_away_team = {str(match['id']): match['awayTeam']['name'] for match in matches}
-        self.add_item(SelectMatch(options, user_id, id_to_home_team, id_to_away_team))
+        if len(self.matches) > 0:
+            self.add_item(SelectMatch(options, user_id, id_to_home_team, id_to_away_team))
 
 class SelectMatch(Select):
     def __init__(self, options, user_id, id_to_home_team, id_to_away_team):
@@ -125,7 +126,8 @@ async def register_predict_command(ctx,bot):
         await ctx.response.send_message("No upcoming or ongoing matches found.")
         return
     matches_message = show_upcoming_matches(ongoing_matches, user_id)
-    print('the next matches are',next_matchday_matches)
+    # print('next_matchday_matches',next_matchday_matches )
+    # print('ongoing_matches',ongoing_matches)
     # Send the message with the match list and then add the dropdown
     view = MatchSelectView(ctx, user_id, bot, next_matchday_matches)
     view.message = await ctx.response.send_message(matches_message, view=view, ephemeral=True)
